@@ -112,7 +112,8 @@ pipeline {
                         }
                         // Update the image tag and chart version in the deployment configuration
                         sh """
-                        cd gitops-repo/infra/carapp
+                        cd gitops-repo
+                        cd infra/carapp
                         sed -i 's|tag: .*|tag: ${RELEASE_TAG}|g' values.yaml
                         sed -i 's|version: .*|version: ${RELEASE_TAG}|g' Chart.yaml
                         git add .
@@ -134,6 +135,8 @@ pipeline {
         }
         always {
             sh 'docker compose down || true' 
+            cleanWs()
         }
     }
+    
 }
