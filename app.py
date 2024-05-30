@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 
 # MongoDB connection
-client = MongoClient(os.getenv('MONGO_URI',"mongodb://mongo:27017/"))
+client = MongoClient(os.getenv('MONGODB_URI',"mongodb://mongo:27017/"))
 db = client.car_database
 cars_collection = db.cars
 
