@@ -1,0 +1,42 @@
+services:
+  app:
+    build: .
+    container_name: cars-app-container
+    ports:
+      - "5001:5000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/
+    volumes:
+      - .:/app
+    networks:
+      - front-network
+      - back-network
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:4.2.24-bionic
+    container_name: mongodb-container
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - back-network
+    
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    container_name: nginx-container
+    ports:
+      - "80:80"
+    networks:
+      - front-network
+    depends_on:
+      - app
+
+volumes:
+  mongo-data:
+
+networks:
+  front-network:
+  back-network:

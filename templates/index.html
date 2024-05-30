@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Car Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1,
+        h2 {
+            margin-top: 20px;
+        }
+
+        form {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        label,
+        input {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        button {
+            margin-top: 10px;
+        }
+
+        .car-item {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f1f1f1;
+        }
+
+        .car-item div {
+            margin-bottom: 10px;
+        }
+
+        .car-item form {
+            display: inline;
+            margin-right: 10px;
+        }
+
+        .car-item form:last-child {
+            margin-right: 0;
+        }
+
+        .car-item label {
+            display: inline;
+            margin-right: 5px;
+        }
+
+        .car-item input {
+            display: inline;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Car Management</h1>
+
+    <h2>Add Car</h2>
+    <form action="/car" method="post">
+        <label for="addModel">Model:</label>
+        <input type="text" id="addModel" name="model" required><br>
+        <label for="addLicense">License:</label>
+        <input type="text" id="addLicense" name="license" required><br>
+        <label for="addOwner">Owner:</label>
+        <input type="text" id="addOwner" name="owner" required><br>
+        <button type="submit">Add Car</button>
+    </form>
+
+    <h2>Car List</h2>
+    <ul id="carList">
+        {% for car in cars %}
+        <li class="car-item">
+            <div><strong>ID:</strong> {{ car._id }}, <strong>Model:</strong> {{ car.model }}, <strong>License:</strong>
+                {{ car.license }}, <strong>Owner:</strong> {{ car.owner }}</div>
+            <form action="/car/{{ car._id }}" method="post">
+                <label for="updateModel{{ car._id }}">Model:</label>
+                <input type="text" id="updateModel{{ car._id }}" name="model" value="{{ car.model }}" required>
+                <label for="updateLicense{{ car._id }}">License:</label>
+                <input type="text" id="updateLicense{{ car._id }}" name="license" value="{{ car.license }}" required>
+                <label for="updateOwner{{ car._id }}">Owner:</label>
+                <input type="text" id="updateOwner{{ car._id }}" name="owner" value="{{ car.owner }}" required>
+                <button type="submit">Update Car</button>
+            </form>
+            <form action="/car/delete/{{ car._id }}" method="post">
+                <button type="submit">Delete Car</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+
+</html>
