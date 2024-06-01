@@ -2,9 +2,11 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 import os
+from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__)
 
+metrics = PrometheusMetrics(app)
 # MongoDB connection
 client = MongoClient(os.getenv('MONGODB_URI',"mongodb://mongo:27017/"))
 db = client.car_database
@@ -57,10 +59,10 @@ def get_car(id):
     car['_id'] = str(car['_id'])
     return jsonify(car)
 
-@app.route('/metrics', methods=['GET'])
-def get_metrics():
-    total_cars = cars_collection.count_documents({})
-    return jsonify({"total_cars": total_cars})
+# @app.route('/metrics', methods=['GET'])
+# def get_metrics():
+#     total_cars = cars_collection.count_documents({})
+#     return jsonify({"total_cars": total_cars})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
