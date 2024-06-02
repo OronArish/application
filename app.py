@@ -4,27 +4,22 @@ from bson.objectid import ObjectId
 import os
 import logging
 from fluent import sender
-from fluent import event
 from prometheus_flask_exporter import PrometheusMetrics
+from logging.handlers import RotatingFileHandler
 
 app = Flask(__name__)
 
 metrics = PrometheusMetrics(app)
 
-logger = logging.getLogger('fluent.test')
-logger.setLevel(logging.INFO)
+ile_handler = RotatingFileHandler('app.log', maxBytes=10240, backupCount=10)
+file_handler.setLevel(logging.INFO)
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+file_handler.setFormatter(formatter)
 
-fluent_sender = sender.FluentSender('fluentd', host='localhost', port=24224)
-
-class FluentHandler(logging.Handler):
-    def emit(self, record):
-        log_entry = self.format(record)
-        fluent_sender.emit('fluent.test', {'message': log_entry})
-
-fluent_handler = FluentHandler()
-formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s')
-fluent_handler.setFormatter(formatter)
-logger.addHandler(fluent_handler)
+app.logger.addHandler(file_handler)
+app.logger.setLevel(logging.INFO)
 
 # MongoDB connection
 client = MongoClient(os.getenv('MONGODB_URI',"mongodb://mongo:27017/"))
