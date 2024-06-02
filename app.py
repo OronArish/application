@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 metrics = PrometheusMetrics(app)
 
-ile_handler = RotatingFileHandler('app.log', maxBytes=10240, backupCount=10)
+file_handler = RotatingFileHandler('app.log', maxBytes=10240, backupCount=10)
 file_handler.setLevel(logging.INFO)
 formatter = logging.Formatter(
     '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
