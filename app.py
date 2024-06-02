@@ -2,11 +2,25 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 import os
+import logging
+from fluent import handler as fluent_handler
 from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__)
 
 metrics = PrometheusMetrics(app)
+
+logger = logging.getLogger('fluent.test')
+logger.setLevel(logging.INFO)
+fluent_handler = fluent_handler.FluentHandler('fluentd.test', host='localhost', port=24224)
+formatter = fluent_handler.FluentRecordFormatter({
+    'host': '%(hostname)s',
+    'where': '%(module)s.%(funcName)s',
+    'type': 'flask',
+    'level': '%(levelname)s'
+})
+fluent_handler.setFormatter(formatter)
+logger.addHandler(fluent_handler)
 
 # MongoDB connection
 client = MongoClient(os.getenv('MONGODB_URI',"mongodb://mongo:27017/"))
