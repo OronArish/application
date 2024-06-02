@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 metrics = PrometheusMetrics(app)
 
-file_handler = RotatingFileHandler('app.log', maxBytes=10240, backupCount=10)
+file_handler = RotatingFileHandler('/var/log/flask/app.log', maxBytes=10240, backupCount=10)
 file_handler.setLevel(logging.INFO)
 formatter = logging.Formatter(
     '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -20,6 +20,14 @@ file_handler.setFormatter(formatter)
 
 app.logger.addHandler(file_handler)
 app.logger.setLevel(logging.INFO)
+
+def log_request_info():
+    app.logger.info('Request: %s %s %s', request.method, request.path, request.data)
+
+@app.after_request
+def log_response_info(response):
+    app.logger.info('Response: %s %s', response.status, response.data)
+    return response
 
 # MongoDB connection
 client = MongoClient(os.getenv('MONGODB_URI',"mongodb://mongo:27017/"))
