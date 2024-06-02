@@ -3,7 +3,8 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 import os
 import logging
-from fluent import handler as fluent_handler
+from fluent import sender
+from fluent import event
 from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__)
@@ -12,13 +13,16 @@ metrics = PrometheusMetrics(app)
 
 logger = logging.getLogger('fluent.test')
 logger.setLevel(logging.INFO)
-fluent_handler = fluent_handler.FluentHandler('fluentd.test', host='localhost', port=24224)
-formatter = fluent_handler.FluentRecordFormatter({
-    'host': '%(hostname)s',
-    'where': '%(module)s.%(funcName)s',
-    'type': 'flask',
-    'level': '%(levelname)s'
-})
+
+fluent_sender = sender.FluentSender('fluentd', host='localhost', port=24224)
+
+class FluentHandler(logging.Handler):
+    def emit(self, record):
+        log_entry = self.format(record)
+        fluent_sender.emit('fluent.test', {'message': log_entry})
+
+fluent_handler = FluentHandler()
+formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s: %(message)s')
 fluent_handler.setFormatter(formatter)
 logger.addHandler(fluent_handler)
 
