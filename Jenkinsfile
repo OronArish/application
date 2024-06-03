@@ -106,13 +106,11 @@ pipeline {
             steps {
                 script {
                     sshagent(['gitlab-ssh-key']) {
-                        // Check if the directory exists before cloning
                         if (!fileExists('gitops-repo')) {
                             sh "git clone ${GITOPS_REPO} gitops-repo"
                         } else {
                             echo "Directory 'gitops-repo' already exists. Skipping cloning."
                         }
-                        // Update the image tag and chart version in the deployment configuration
                         sh """
                         cd gitops-repo
                         cd infra/carapp
