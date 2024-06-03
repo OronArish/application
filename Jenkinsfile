@@ -38,9 +38,6 @@ pipeline {
             steps {
                 script {
                     sh "docker build -t ${ECR_REGISTRY}/${IMAGE_NAME}:${RELEASE_TAG} ."
-                    sh "docker build -f Dockerfile.test -t test-image ."
-                    sh "docker build -f Dockerfile.e2e -t e2e-test-image ."
-
                 }
             }
         }
@@ -48,7 +45,11 @@ pipeline {
         stage('Unit tests') {
             steps {
                 script {
-                     sh 'docker run --rm test-image' 
+                    sh '''
+                    chmod +x ./tests/e2e_tests.sh
+                    chmod +x ./tests/unit_tests.sh
+                    ./tests/unit_tests.sh
+                    '''
                 }
             }
         }
@@ -56,17 +57,12 @@ pipeline {
         stage('E2E Tests') {
             steps {
                 script {
-                    sh 'docker compose up -d'
                     sh '''
-                        sleep 10
-                        'docker network create test_network'
-                        'docker network connect test_network app'
-                        'docker run --network=test_network --rm --name e2e_test e2e-test-image'
-                        'docker network disconnect test_network app'
-                        docker network rm test_network
-                        'docker compose down'
+                    docker compose up -d
+                    sleep 10
+                    ./tests/e2e_tests.sh
+                     docker compose down
                     '''
-                    sh 'docker compose down'
                 }
             }
         }

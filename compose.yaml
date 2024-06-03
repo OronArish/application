@@ -11,7 +11,6 @@ services:
     networks:
       - front-network
       - back-network
-      - test-network
     depends_on:
       - mongo
 
@@ -41,4 +40,3 @@ volumes:
 networks:
   front-network:
   back-network:
-  test-network:
