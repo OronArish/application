@@ -45,25 +45,31 @@ pipeline {
             }
         }
 
-        // stage('Unit tests') {
-        //     steps {
-        //         script {
-        //              sh 'docker run --rm test-image' 
-        //         }
-        //     }
-        // }
+        stage('Unit tests') {
+            steps {
+                script {
+                     sh 'docker run --rm test-image' 
+                }
+            }
+        }
 
-        // stage('E2E Tests') {
-        //     steps {
-        //         script {
-        //             sh 'docker compose down || true'
-        //             sh 'docker compose up -d'
-        //             sleep 10
-        //             sh 'docker run --rm e2e-test-image'
-        //             sh 'docker compose down'
-        //         }
-        //     }
-        // }
+        stage('E2E Tests') {
+            steps {
+                script {
+                    sh 'docker compose up -d'
+                    sh '''
+                        sleep 10
+                        'docker network create test_network'
+                        'docker network connect test_network app'
+                        'docker run --network=test_network --rm --name e2e_test e2e-test-image'
+                        'docker network disconnect test_network app'
+                        docker network rm test_network
+                        'docker compose down'
+                    '''
+                    sh 'docker compose down'
+                }
+            }
+        }
 
         stage('Tag') {
             when {
