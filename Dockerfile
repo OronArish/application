@@ -5,6 +5,7 @@ WORKDIR /app
 COPY app.py .
 COPY requirements.txt .
 COPY templates/ templates
+COPY tests/ tests
 
 RUN pip install -r requirements.txt
 
