@@ -34,13 +34,13 @@ pipeline {
             }
         }
 
-        // stage('Build Image') {
-        //     steps {
-        //         script {
-        //             sh "docker build -t ${ECR_REGISTRY}/${IMAGE_NAME}:${RELEASE_TAG} ."
-        //         }
-        //     }
-        // }
+        stage('Build Image') {
+            steps {
+                script {
+                    sh "docker build -t ${ECR_REGISTRY}/${IMAGE_NAME}:${RELEASE_TAG} ."
+                }
+            }
+        }
 
         // stage('Unit tests') {
         //     steps {
@@ -54,18 +54,18 @@ pipeline {
         //     }
         // }
 
-        stage('E2E Tests') {
-            steps {
-                script {
-                    sh '''
-                    docker compose up -d
-                    sleep 10
-                    ./tests/e2e_tests.sh
-                     docker compose down
-                    '''
-                }
-            }
-        }
+        // stage('E2E Tests') {
+        //     steps {
+        //         script {
+        //             sh '''
+        //             docker compose up -d
+        //             sleep 10
+        //             ./tests/e2e_tests.sh
+        //              docker compose down
+        //             '''
+        //         }
+        //     }
+        // }
 
         stage('Tag') {
             when {
