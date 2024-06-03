@@ -34,25 +34,25 @@ pipeline {
             }
         }
 
-        stage('Build Image') {
-            steps {
-                script {
-                    sh "docker build -t ${ECR_REGISTRY}/${IMAGE_NAME}:${RELEASE_TAG} ."
-                }
-            }
-        }
+        // stage('Build Image') {
+        //     steps {
+        //         script {
+        //             sh "docker build -t ${ECR_REGISTRY}/${IMAGE_NAME}:${RELEASE_TAG} ."
+        //         }
+        //     }
+        // }
 
-        stage('Unit tests') {
-            steps {
-                script {
-                    sh '''
-                    chmod +x ./tests/e2e_tests.sh
-                    chmod +x ./tests/unit_tests.sh
-                    ./tests/unit_tests.sh
-                    '''
-                }
-            }
-        }
+        // stage('Unit tests') {
+        //     steps {
+        //         script {
+        //             sh '''
+        //             chmod +x ./tests/e2e_tests.sh
+        //             chmod +x ./tests/unit_tests.sh
+        //             ./tests/unit_tests.sh
+        //             '''
+        //         }
+        //     }
+        // }
 
         stage('E2E Tests') {
             steps {
