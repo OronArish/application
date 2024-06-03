@@ -106,7 +106,6 @@ pipeline {
             steps {
                 script {
                     sshagent(['gitlab-ssh-key']) {
-                        // Check if the directory exists before cloning
                         if (!fileExists('gitops-repo')) {
                             sh "git clone ${GITOPS_REPO} gitops-repo"
                         } else {
