@@ -10,7 +10,6 @@ CAR_ID="665ebab33d5624a22a0f647e"
 function add_car() {
     echo "Adding a new car..."
     response=$(curl -s -X POST -d "model=$1&license=$2&owner=$3" "$BASE_URL/car" -H "Content-Type: application/x-www-form-urlencoded")
-    echo "Response from server: $response"  # Debug: Print the response
 }
 
 # Function to get all cars
@@ -23,14 +22,12 @@ function get_all_cars() {
 function update_car() {
     echo "Updating car with ID $1..."
     response=$(curl -s -X POST -d "model=$2&license=$3&owner=$4" "$BASE_URL/car/$1" -H "Content-Type: application/x-www-form-urlencoded")
-    echo "Response from server: $response"  # Debug: Print the response
 }
 
 # Function to delete a car
 function delete_car() {
     echo "Deleting car with ID $1..."
     response=$(curl -s -X POST "$BASE_URL/car/delete/$1")
-    echo "Response from server: $response"  # Debug: Print the response
 }
 
 # Test adding a car
