@@ -1,13 +1,12 @@
 #!/bin/bash
 
 # Base URL for the application
-BASE_URL="http://localhost:80"  # Adjust based on your Jenkins setup
+BASE_URL="http://localhost:80"  
 
 # Functions should be declared before use
 function add_car() {
     echo "Adding a new car..."
     response=$(curl -s -X POST -d "model=$1&license=$2&owner=$3" "$BASE_URL/car" -H "Content-Type: application/x-www-form-urlencoded")
-    echo "Response from server: $response"  # Debug: Print the response
 }
 
 function get_all_cars() {
@@ -18,13 +17,11 @@ function get_all_cars() {
 function update_car() {
     echo "Updating car with ID $1..."
     response=$(curl -s -X POST -d "model=$2&license=$3&owner=$4" "$BASE_URL/car/$1" -H "Content-Type: application/x-www-form-urlencoded")
-    echo "Response from server: $response"
 }
 
 function delete_car() {
     echo "Deleting car with ID $1..."
     response=$(curl -s -X POST "$BASE_URL/car/delete/$1")
-    echo "Response from server: $response"
 }
 
 # Known car ID for testing (replace with a valid car ID from your API)
