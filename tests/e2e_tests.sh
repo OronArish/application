@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Base URL for the application
-BASE_URL="http://host.docker.internal"  # Adjust based on your Jenkins setup
+BASE_URL="http://localhost:80"  # Adjust based on your Jenkins setup
 
 # Functions should be declared before use
 function add_car() {
