@@ -71,6 +71,9 @@ pipeline {
         }
 
         stage('Tag Image with New Tag') {
+            when {
+                branch 'main'
+            }
             steps {
                 script {
                     echo "Tagging Docker image with new tag: ${RELEASE_TAG}"
