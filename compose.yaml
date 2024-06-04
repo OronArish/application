@@ -7,8 +7,6 @@ services:
     networks:
       - front-network
       - back-network
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     depends_on:
       - mongo
 
