@@ -3,7 +3,6 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 import os
 import logging
-from fluent import sender
 from prometheus_flask_exporter import PrometheusMetrics
 from logging.handlers import RotatingFileHandler
 

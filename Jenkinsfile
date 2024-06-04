@@ -12,28 +12,6 @@ pipeline {
     }
 
     stages {
-        stage('Version') {
-            steps {
-                script {
-                    sshagent(['gitlab-ssh-key']) {
-                    def last_digit = 0
-                    echo "Fetching tags from git"
-                    sh """git fetch --tags"""
-                    def git_tags= sh(script: "git tag -l --sort=-v:refname", returnStdout: true).trim()
-                    echo "Git tags=${git_tags}"
-                    if(git_tags != "") {
-                        last_version = git_tags.tokenize("\n")[0]
-                        last_version = last_version.tokenize("-")[0]
-                        last_version = last_version.tokenize(".")
-                        last_digit = last_version[2].toInteger()
-                        last_digit += 1
-                        RELEASE_TAG="${last_version[0]}.${last_version[1]}.${last_digit}"
-                    }
-                }
-            }
-            }
-        }
-
         stage('Build Image') {
             steps {
                 script {
@@ -64,6 +42,27 @@ pipeline {
                      docker compose down
                     '''
                 }
+            }
+        }
+        stage('Version') {
+            steps {
+                script {
+                    sshagent(['gitlab-ssh-key']) {
+                    def last_digit = 0
+                    echo "Fetching tags from git"
+                    sh """git fetch --tags"""
+                    def git_tags= sh(script: "git tag -l --sort=-v:refname", returnStdout: true).trim()
+                    echo "Git tags=${git_tags}"
+                    if(git_tags != "") {
+                        last_version = git_tags.tokenize("\n")[0]
+                        last_version = last_version.tokenize("-")[0]
+                        last_version = last_version.tokenize(".")
+                        last_digit = last_version[2].toInteger()
+                        last_digit += 1
+                        RELEASE_TAG="${last_version[0]}.${last_version[1]}.${last_digit}"
+                    }
+                }
+            }
             }
         }
 
