@@ -1,4 +1,5 @@
 def RELEASE_TAG='1.0.0'
+
 pipeline {
     agent any
     environment {
@@ -15,7 +16,8 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
-                    sh "docker build -t ${ECR_REGISTRY}/${IMAGE_NAME}:${RELEASE_TAG} ."
+                    echo "Building Docker image with tag: latest"
+                    sh "docker build -t ${ECR_REGISTRY}/${IMAGE_NAME}:latest ."
                 }
             }
         }
@@ -39,30 +41,41 @@ pipeline {
                     docker compose up -d
                     sleep 10
                     ./tests/e2e_tests.sh
-                     docker compose down
+                    docker compose down
                     '''
                 }
             }
         }
+
         stage('Version') {
             steps {
                 script {
                     sshagent(['gitlab-ssh-key']) {
-                    def last_digit = 0
-                    echo "Fetching tags from git"
-                    sh """git fetch --tags"""
-                    def git_tags= sh(script: "git tag -l --sort=-v:refname", returnStdout: true).trim()
-                    echo "Git tags=${git_tags}"
-                    if(git_tags != "") {
-                        last_version = git_tags.tokenize("\n")[0]
-                        last_version = last_version.tokenize("-")[0]
-                        last_version = last_version.tokenize(".")
-                        last_digit = last_version[2].toInteger()
-                        last_digit += 1
-                        RELEASE_TAG="${last_version[0]}.${last_version[1]}.${last_digit}"
+                        echo "Fetching tags from git"
+                        sh 'git fetch --tags'
+                        def git_tags = sh(script: "git tag -l --sort=-v:refname", returnStdout: true).trim()
+                        echo "Git tags: ${git_tags}"
+                        if (git_tags) {
+                            def last_version = git_tags.tokenize("\n")[0]
+                            last_version = last_version.tokenize("-")[0]
+                            def last_version_parts = last_version.tokenize(".")
+                            def last_digit = last_version_parts[2].toInteger() + 1
+                            RELEASE_TAG = "${last_version_parts[0]}.${last_version_parts[1]}.${last_digit}"
+                            echo "New release tag: ${RELEASE_TAG}"
+                        } else {
+                            echo "No existing tags found, using default tag: ${RELEASE_TAG}"
+                        }
                     }
                 }
             }
+        }
+
+        stage('Tag Image with New Tag') {
+            steps {
+                script {
+                    echo "Tagging Docker image with new tag: ${RELEASE_TAG}"
+                    sh "docker tag ${ECR_REGISTRY}/${IMAGE_NAME}:latest ${ECR_REGISTRY}/${IMAGE_NAME}:${RELEASE_TAG}"
+                }
             }
         }
 
@@ -75,8 +88,8 @@ pipeline {
                     sshagent(['gitlab-ssh-key']) {
                         sh "git config --global user.email 'jenkins@example.com'"
                         sh "git config --global user.name 'Jenkins'"
-                        def version = "${RELEASE_TAG}"
-                        version = version.replaceAll('^v', '')
+                        def version = "${RELEASE_TAG}".replaceAll('^v', '')
+                        echo "Creating new git tag: ${version}"
                         sh "git tag -a ${version} -m 'New release'"
                         sh "git push origin ${version}"
                     }
@@ -92,6 +105,7 @@ pipeline {
                 script {
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'ee8c78f8-da06-49da-9325-41e865e3b53b']]) {
                         sh "aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ECR_REGISTRY"
+                        echo "Pushing Docker image with tag: ${RELEASE_TAG} to ECR"
                         sh "docker push $ECR_REGISTRY/$IMAGE_NAME:${RELEASE_TAG}"
                     }
                 }
@@ -119,7 +133,7 @@ pipeline {
                         git commit -m "Update image tag and chart version to ${RELEASE_TAG}"
                         git push
                         """
-                  }
+                    }
                 }
             }
         }
@@ -133,10 +147,8 @@ pipeline {
             echo 'Pipeline failed!'
         }
         always {
-            sh 'docker compose down || true' 
+            sh 'docker compose down || true'
             cleanWs()
         }
     }
-    
 }
-//
