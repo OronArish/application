@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Base URL for the application
-BASE_URL="http://localhost:5000"
+BASE_URL="http://localhost:80"
 
 # Known car ID for testing (replace with a valid car ID from your API)
 CAR_ID="665ebab33d5624a22a0f647e"

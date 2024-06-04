@@ -2,8 +2,6 @@ services:
   app:
     build: .
     container_name: cars-app-container
-    ports:
-      - "5001:5000"
     environment:
       - MONGODB_URI=mongodb://mongo:27017/
     networks:
