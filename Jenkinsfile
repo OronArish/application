@@ -38,7 +38,6 @@ pipeline {
                     sh '''
                     docker network disconnect test-network ubuntu-jenkins-1
                     docker network disconnect test-network nginx-container
-                    docker network rm test-network
                     '''
                   
                 }
