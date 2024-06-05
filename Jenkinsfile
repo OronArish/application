@@ -38,7 +38,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    docker compose up -d
+                    docker compose up -d --build
                     docker network create test-network
                     docker network connect test-network ubuntu-jenkins-1
                     docker network connect test-network nginx-container
