@@ -35,11 +35,6 @@ pipeline {
                     '''
                     def output = sh(script: './tests/unit_tests.sh', returnStdout: true).trim()
                     echo "Unit Test Output: ${output}"
-                    sh '''
-                    docker network disconnect test-network ubuntu-jenkins-1
-                    docker network disconnect test-network nginx-container
-                    '''
-                  
                 }
             }
         }
