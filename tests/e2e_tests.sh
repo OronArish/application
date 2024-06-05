@@ -1,27 +1,55 @@
 #!/bin/bash
 
 set -e
+set -x  # Print each command for debugging
 
 # Base URL for the application
 BASE_URL="http://nginx-container:80"  
 
-CAR_ID="665ebab33d5624a22a0f647e"
-
-# Test adding a car
+# Define car details
 model="Tesla"
 license="123-ABC"
 owner="Elon"
 
-# add new car
-curl -s -X POST -d "model=$1&license=$2&owner=$3" "$BASE_URL/car" -H "Content-Type: application/x-www-form-urlencoded"
+function add_car() {
+    echo "Testing Adding a New Car..."
+    local add_response=$(curl -s -X POST -d "model=$model&license=$license&owner=$owner" "$BASE_URL/car" -H "Content-Type: application/x-www-form-urlencoded")
+    echo "Add response: $add_response"
+    local car_id=$(echo $add_response | grep -o '"id":"\([^"]*\)' | cut -d':' -f2 | tr -d '"')
+    echo "Extracted Car ID: $car_id"
+    if [ -z "$car_id" ]; then
+        echo "Failed to extract car ID from add response."
+        return 1
+    fi
+    echo $car_id
+}
 
-# get all cars
-curl -s -X GET "$BASE_URL/cars"
+function get_all_cars() {
+    echo "Testing Retrieving All Cars..."
+    local all_cars=$(curl -s -X GET "$BASE_URL/cars")
+    echo "All cars: $all_cars"
+}
 
-# update car
-curl -s -X POST -d "model=$2&license=$3&owner=$4" "$BASE_URL/car/66601c6bbf9be378332f8db5" -H "Content-Type: application/x-www-form-urlencoded")
-   
-# delete
-curl -s -X POST "$BASE_URL/car/delete/$1"
+function update_car() {
+    local car_id=$1
+    echo "Testing Updating Car..."
+    local update_response=$(curl -s -X POST -d "model=$model&license=$license&owner=New Owner" "$BASE_URL/car/$car_id" -H "Content-Type: application/x-www-form-urlencoded")
+    echo "Update response: $update_response"
+}
 
+function delete_car() {
+    local car_id=$1
+    echo "Testing Deleting Car..."
+    local delete_response=$(curl -s -X POST "$BASE_URL/car/delete/$car_id")
+    echo "Delete response: $delete_response"
+}
 
+# Main execution flow
+car_id=$(add_car)
+if [ $? -eq 0 ]; then
+    get_all_cars
+    update_car $car_id
+    delete_car $car_id
+else
+    echo "Error adding car. Aborting tests."
+fi
