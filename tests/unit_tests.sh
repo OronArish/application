@@ -1,15 +1,12 @@
 #!/bin/bash
 
-function test_dummy {
-    # Example of a simple condition test in Bash
-    expected=1
-    actual=1
-    if [ "$actual" -eq "$expected" ]; then
-        echo "Test passed."
+BASE_URL="http://nginx-container:80"  
+
+function check_website() {
+    echo "Checking if the website is up..."
+    if curl -s --head --request GET "$BASE_URL" | grep "200 OK" > /dev/null; then
+        echo "The website is up and running."
     else
-        echo "Test failed."
-        exit 1  # Exits the script with an error code of 1
+        echo "The website is not responding."
     fi
 }
-
-test_dummy  # Call the function to execute the test

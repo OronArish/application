@@ -28,6 +28,10 @@ pipeline {
                     sh '''
                     chmod +x ./tests/e2e_tests.sh
                     chmod +x ./tests/unit_tests.sh
+                    docker compose up -d --build
+                    docker network create test-network
+                    docker network connect test-network ubuntu-jenkins-1
+                    docker network connect test-network nginx-container
                     ./tests/unit_tests.sh
                     '''
                 }
@@ -38,10 +42,6 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    docker compose up -d --build
-                    docker network create test-network
-                    docker network connect test-network ubuntu-jenkins-1
-                    docker network connect test-network nginx-container
                     ./tests/e2e_tests.sh
                     docker network disconnect test-network ubuntu-jenkins-1
                     docker network disconnect test-network nginx-container
