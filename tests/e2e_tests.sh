@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Base URL for the application
-BASE_URL="http://localhost:80"  
+BASE_URL="http://nginx-container:80"  
 
 # Functions should be declared before use
 function add_car() {

@@ -39,7 +39,9 @@ pipeline {
                 script {
                     sh '''
                     docker compose up -d
-                    sleep 10
+                    docker network create test-network
+                    docker network connect test-network ubuntu-jenkins-1
+                    docker network connect test-network nginx-container
                     ./tests/e2e_tests.sh
                     docker compose down
                     '''
