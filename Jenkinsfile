@@ -43,6 +43,9 @@ pipeline {
                     docker network connect test-network ubuntu-jenkins-1
                     docker network connect test-network nginx-container
                     ./tests/e2e_tests.sh
+                    docker network disconnect test-network ubuntu-jenkins-1
+                    docker network disconnect test-network nginx-container
+                    docker network rm test-network
                     docker compose down
                     '''
                 }
