@@ -48,11 +48,6 @@ pipeline {
         stage('E2E Tests') {
             steps {
                 script {
-                    sh '''
-                    docker network create test-network || true  
-                    docker network connect test-network ubuntu-jenkins-1 || true 
-                    docker network connect test-network nginx-container || true 
-                    '''
                     def output = sh(script: './tests/e2e_tests.sh', returnStdout: true).trim()
                     echo "e2e tests Output: ${output}"
                     sh '''
