@@ -29,11 +29,13 @@ pipeline {
                     chmod +x ./tests/e2e_tests.sh
                     chmod +x ./tests/unit_tests.sh
                     docker compose up -d --build
-                    docker network create test-network
-                    docker network connect test-network ubuntu-jenkins-1
-                    docker network connect test-network nginx-container
-                    ./tests/unit_tests.sh
+                    docker network create test-network || true  // Ignore error if network already exists
+                    docker network connect test-network ubuntu-jenkins-1 || true  // Ignore error if already connected
+                    docker network connect test-network nginx-container || true  // Ignore error if already connected
                     '''
+                    def output = sh(script: './tests/unit_tests.sh', returnStdout: true).trim()
+                    echo "Unit Test Output: ${output}"
+                  
                 }
             }
         }
@@ -41,8 +43,9 @@ pipeline {
         stage('E2E Tests') {
             steps {
                 script {
+                    def output = sh(script: './tests/e2e_tests.sh', returnStdout: true).trim()
+                    echo "Unit Test Output: ${output}"
                     sh '''
-                    ./tests/e2e_tests.sh
                     docker network disconnect test-network ubuntu-jenkins-1
                     docker network disconnect test-network nginx-container
                     docker network rm test-network

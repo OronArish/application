@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 BASE_URL="http://nginx-container:80"  
 
 function check_website() {
@@ -10,3 +12,5 @@ function check_website() {
         echo "The website is not responding."
     fi
 }
+
+check_website()

@@ -1,36 +1,31 @@
 #!/bin/bash
 
+set -e
+
 # Base URL for the application
-BASE_URL="http://nginx-container:80"  
+BASE_URL="http://nginx-container:80"
 
-CAR_ID="665ebab33d5624a22a0f647e"
-
-# Test adding a car
+# Define car details
 model="Tesla"
 license="123-ABC"
 owner="Elon"
 
-# Functions should be declared before use
-function add_car() {
-    echo "Adding a new car..."
-    response=$(curl -s -X POST -d "model=$1&license=$2&owner=$3" "$BASE_URL/car" -H "Content-Type: application/x-www-form-urlencoded")
-    echo ${response}
-}
+# Add new car
+add_response=$(curl -s -X POST -d "model=$model&license=$license&owner=$owner" "$BASE_URL/car" -H "Content-Type: application/x-www-form-urlencoded")
+echo "Add response: $add_response"
 
-function get_all_cars() {
-    echo "Fetching all cars..."
-    response= $(curl -s -X GET "$BASE_URL/cars")
-    echo ${response}
-}
+# Assuming the add response includes the ID of the car
+# Extracting car ID using a placeholder method - adjust based on your actual response format
+car_id=$(echo $add_response | grep -o '"id":"\([^"]*\)' | cut -d':' -f2 | tr -d '"')
 
-function update_car() {
-    echo "Updating car with ID $1..."
-    response=$(curl -s -X POST -d "model=$2&license=$3&owner=$4" "$BASE_URL/car/$1" -H "Content-Type: application/x-www-form-urlencoded")
-    echo ${response}
-}
+# Get all cars
+all_cars=$(curl -s -X GET "$BASE_URL/cars")
+echo "All cars: $all_cars"
 
-function delete_car() {
-    echo "Deleting car with ID $1..."
-    response=$(curl -s -X POST "$BASE_URL/car/delete/$1")
-}
+# Update car - replace '66601c6bbf9be378332f8db5' with $car_id which is dynamically extracted
+update_response=$(curl -s -X POST -d "model=$model&license=$license&owner=New Owner" "$BASE_URL/car/$car_id" -H "Content-Type: application/x-www-form-urlencoded")
+echo "Update response: $update_response"
 
+# Delete car
+delete_response=$(curl -s -X POST "$BASE_URL/car/delete/$car_id")
+echo "Delete response: $delete_response"
