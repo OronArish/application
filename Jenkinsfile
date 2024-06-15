@@ -152,9 +152,20 @@ pipeline {
     post {
         success {
             echo 'Pipeline completed successfully!'
+            emailext(
+                subject: "SUCCESS: Jenkins build #${BUILD_NUMBER}",
+                body: "The build has succeeded!",
+                recipientProviders: [culprits(), requestor()]
+            )
+            
         }
         failure {
             echo 'Pipeline failed!'
+            emailext(
+                subject: "FAILED: Jenkins build #${BUILD_NUMBER}",
+                body: "The build has failed!",
+                recipientProviders: [culprits(), requestor()]
+            )
         }
         always {
             sh 'docker compose down || true'
