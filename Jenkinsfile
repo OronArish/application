@@ -29,8 +29,8 @@ pipeline {
                     chmod +x ./tests/e2e_tests.sh
                     chmod +x ./tests/unit_tests.sh
                     docker compose up -d --build
-                    docker network create test-network || true 
-                    docker network connect test-network ubuntu-jenkins-1 || true  
+                    docker network create test-network || true  
+                    docker network connect test-network ubuntu-jenkins-1 || true 
                     docker network connect test-network nginx-container || true 
                     '''
                     def output = sh(script: './tests/unit_tests.sh', returnStdout: true).trim()
@@ -54,7 +54,7 @@ pipeline {
             }
         }
 
-        stage('Version') {
+        stage('Calculate version') {
             steps {
                 script {
                     sshagent(['gitlab-ssh-key']) {
@@ -89,7 +89,7 @@ pipeline {
             }
         }
 
-        stage('Tag') {
+        stage('Push tag') {
             when {
                 branch 'main'
             }
